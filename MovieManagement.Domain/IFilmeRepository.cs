@@ -8,7 +8,7 @@ namespace MovieManagement.Domain
     {
         void AdicionarFilme(Filme filme);
         List<Filme> ListarFilmes();
-        Filme ProcurarPorTitulo(string titulo);
+        Filme? ProcurarPorTitulo(string titulo);
         void RemoverFilme(int id);
     }
 }
