@@ -9,32 +9,14 @@ bool sair = false;
 
 while (!sair)
 {
-    Console.WriteLine("\n====== MOVIE MANAGEMENT =======");
-    Console.WriteLine();
-    Console.WriteLine("----------- FILMES ------------");
+    Console.WriteLine("\n=== MOVIE MANAGEMENT ===");
     Console.WriteLine();
     Console.WriteLine("1. Adicionar Filme");
     Console.WriteLine("2. Listar Filmes");
     Console.WriteLine("3. Procurar Filme por Título");
     Console.WriteLine("4. Remover Filme");
-    Console.WriteLine();
-    Console.WriteLine("--------- CATEGORIAS ----------");
-    Console.WriteLine();
-    Console.WriteLine("5. Adicionar Categoria");
-    Console.WriteLine("6. Listar Categorias");
-    Console.WriteLine("7. Procurar Categoria");
-    Console.WriteLine("8. Remover Categoria");
-    Console.WriteLine();
-    Console.WriteLine("-------- REALIZADORES ---------");
-    Console.WriteLine();
-    Console.WriteLine("5. Adicionar Realizador");
-    Console.WriteLine("6. Listar Realizadores");
-    Console.WriteLine("7. Procurar Realizador");
-    Console.WriteLine("8. Remover Realizador");
-    Console.WriteLine();
-    Console.WriteLine("===============================");
-    Console.WriteLine();
     Console.WriteLine("0. Sair");
+    Console.WriteLine();
     Console.Write("Opção: ");
 
     string opcao = Console.ReadLine() ?? "";
