@@ -11,6 +11,7 @@ namespace MovieManagement.Data
 
         public void AdicionarFilme(Filme filme)
         {
+            filme.Id = _filmes.Count + 1;
             _filmes.Add(filme);
         }
 

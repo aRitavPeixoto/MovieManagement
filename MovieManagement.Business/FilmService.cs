@@ -14,6 +14,7 @@ namespace MovieManagement.Business
             _repository = repository;
         }
 
+
         public void AdicionarFilme(Filme filme)
         {
             if (string.IsNullOrEmpty(filme.Titulo))
