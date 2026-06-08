@@ -8,7 +8,7 @@
         public int Ano { get; set; }
         public string Lingua { get; set; } = string.Empty;
         public int Classificacao { get; set; }
-
-
+        public int CategoriaId { get; set; }
+        public int RealizadorId { get; set; }
     }
 }

@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MovieManagement.Domain;
+﻿using MovieManagement.Domain;
 
 namespace MovieManagement.Business
 {
     public class FilmeService
     {
         private readonly IFilmeRepository _repository;
+        private readonly ICategoriaRepository _categoriaRepository;
+        private readonly IRealizadorRepository _realizadorRepository;
 
-        public FilmeService(IFilmeRepository repository)
+        public FilmeService(IFilmeRepository repository, ICategoriaRepository categoriaRepository, IRealizadorRepository realizadorRepository)
         {
             _repository = repository;
+            _categoriaRepository = categoriaRepository;
+            _realizadorRepository = realizadorRepository;
         }
-
 
         public void AdicionarFilme(Filme filme)
         {
@@ -25,6 +25,12 @@ namespace MovieManagement.Business
 
             if (filme.Classificacao < 0 || filme.Classificacao > 5)
                 throw new Exception("A classificação deve estar entre 0 e 5.");
+
+            if (filme.CategoriaId <= 0)
+                throw new Exception("A categoria não existe.");
+
+            if (filme.RealizadorId <= 0)
+                throw new Exception("O realizador não existe.");
 
             _repository.AdicionarFilme(filme);
         }

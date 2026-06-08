@@ -27,7 +27,7 @@ namespace MovieManagement.Business
             return _repository.ListarRealizadores();
         }
 
-        public Realizador? ProcurarPorRealizador(string nome)
+        public Realizador? ProcurarRealizador(string nome)
         {
             return _repository.ProcurarRealizador(nome);
         }

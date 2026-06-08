@@ -2,20 +2,21 @@
 using MovieManagement.Data;
 using MovieManagement.Domain;
 
-var filmeRepository = new FilmeRepositoryMemoria();
-var filmeService = new FilmeService(filmeRepository);
+DatabaseHelper.InicializarBaseDados();
 
-var categoriaRepository = new CategoriaRepositoryMemoria();
+var filmeRepository = new FilmeRepositorySQLite();
+var categoriaRepository = new CategoriaRepositorySQLite();
+var realizadorRepository = new RealizadorRepositorySQLite();
 var categoriaService = new CategoriaService(categoriaRepository);
-
-var realizadorRepository = new RealizadorRepositoryMemoria();
 var realizadorService = new RealizadorService(realizadorRepository);
+var filmeService = new FilmeService(filmeRepository, categoriaRepository, realizadorRepository);
 
 bool sair = false;
 
 while (!sair)
 {
     Console.WriteLine("\n=== MOVIE MANAGEMENT ===");
+    Console.WriteLine();
     Console.WriteLine("1. Filmes");
     Console.WriteLine("2. Categorias");
     Console.WriteLine("3. Realizadores");
@@ -24,29 +25,21 @@ while (!sair)
 
     string opcao = Console.ReadLine() ?? "";
 
+
     switch (opcao)
     {
-        case "1":
-            GerirFilmes(filmeService);
-            break;
-        case "2":
-            GerirCategorias(categoriaService);
-            break;
-        case "3":
-            GerirRealizadores(realizadorService);
-            break;
-        case "0":
-            sair = true;
-            break;
-        default:
-            Console.WriteLine("Opção inválida.");
-            break;
+        case "1": GerirFilmes(filmeService, categoriaService, realizadorService); break;
+        case "2": GerirCategorias(categoriaService); break;
+        case "3": GerirRealizadores(realizadorService); break;
+        case "0": sair = true; break;
+        default: Console.WriteLine("Opção inválida."); break;
     }
 }
 
-void GerirFilmes(FilmeService service)
+void GerirFilmes(FilmeService service, CategoriaService categoriaService, RealizadorService realizadorService)
 {
     Console.WriteLine("\n--- FILMES ---");
+    Console.WriteLine();
     Console.WriteLine("1. Adicionar");
     Console.WriteLine("2. Listar");
     Console.WriteLine("3. Procurar por título");
@@ -64,25 +57,38 @@ void GerirFilmes(FilmeService service)
             string lingua = Console.ReadLine() ?? "";
             Console.Write("Classificação (0-5): ");
             int classificacao = int.Parse(Console.ReadLine() ?? "0");
+            Console.Write("CategoriaId: ");
+            int categoriaId = int.Parse(Console.ReadLine() ?? "0");
+            Console.Write("RealizadorId: ");
+            int realizadorId = int.Parse(Console.ReadLine() ?? "0");
             try
             {
-                service.AdicionarFilme(new Filme { Titulo = titulo, Ano = ano, Lingua = lingua, Classificacao = classificacao });
+                service.AdicionarFilme(new Filme { Titulo = titulo, Ano = ano, Lingua = lingua, Classificacao = classificacao, CategoriaId = categoriaId, RealizadorId = realizadorId });
                 Console.WriteLine("Filme adicionado!");
             }
             catch (Exception ex) { Console.WriteLine($"Erro: {ex.Message}"); }
             break;
+
         case "2":
-            var filmes = service.ListarFilmes();
+            var filmes = filmeService.ListarFilmes();
             if (filmes.Count == 0) Console.WriteLine("Nenhum filme.");
             else foreach (var f in filmes)
-                Console.WriteLine($"[{f.Id}] {f.Titulo} ({f.Ano}) - {f.Lingua} - {f.Classificacao}/5");
+            {
+                var cat = categoriaService.ProcurarPorCategoria(
+                    categoriaService.ListarCategorias().FirstOrDefault(c => c.Id == f.CategoriaId)?.Nome ?? "");
+                var real = realizadorService.ProcurarRealizador(
+                    realizadorService.ListarRealizadores().FirstOrDefault(r => r.Id == f.RealizadorId)?.Nome ?? "");
+                Console.WriteLine($"[{f.Id}] {f.Titulo} ({f.Ano}) - {f.Lingua} - {f.Classificacao}/5 - {cat?.Nome ?? "?"} - {real?.Nome ?? "?"}");
+            }
             break;
+
         case "3":
             Console.Write("Título: ");
             var filme = service.ProcurarPorTitulo(Console.ReadLine() ?? "");
             if (filme == null) Console.WriteLine("Não encontrado.");
             else Console.WriteLine($"[{filme.Id}] {filme.Titulo} ({filme.Ano})");
             break;
+
         case "4":
             Console.Write("ID: ");
             service.RemoverFilme(int.Parse(Console.ReadLine() ?? "0"));
@@ -94,6 +100,7 @@ void GerirFilmes(FilmeService service)
 void GerirCategorias(CategoriaService service)
 {
     Console.WriteLine("\n--- CATEGORIAS ---");
+    Console.WriteLine();
     Console.WriteLine("1. Adicionar");
     Console.WriteLine("2. Listar");
     Console.WriteLine("3. Procurar");
@@ -107,7 +114,7 @@ void GerirCategorias(CategoriaService service)
             string nome = Console.ReadLine() ?? "";
             try
             {
-                categoriaService.AdicionarCategoria(new Categoria { Nome = nome });
+                service.AdicionarCategoria(new Categoria { Nome = nome });
                 Console.WriteLine("Categoria adicionada!");
             }
             catch (Exception ex) { Console.WriteLine($"Erro: {ex.Message}"); }
@@ -135,6 +142,7 @@ void GerirCategorias(CategoriaService service)
 void GerirRealizadores(RealizadorService service)
 {
     Console.WriteLine("\n--- REALIZADORES ---");
+    Console.WriteLine();
     Console.WriteLine("1. Adicionar");
     Console.WriteLine("2. Listar");
     Console.WriteLine("3. Procurar");
@@ -150,7 +158,7 @@ void GerirRealizadores(RealizadorService service)
             string pais = Console.ReadLine() ?? "";
             try
             {
-                realizadorService.AdicionarRealizador(new Realizador { Nome = nome, Pais = pais });
+                service.AdicionarRealizador(new Realizador { Nome = nome, Pais = pais });
                 Console.WriteLine("Realizador adicionado!");
             }
             catch (Exception ex) { Console.WriteLine($"Erro: {ex.Message}"); }
@@ -163,7 +171,7 @@ void GerirRealizadores(RealizadorService service)
             break;
         case "3":
             Console.Write("Nome: ");
-            var real = service.ProcurarPorRealizador(Console.ReadLine() ?? "");
+            var real = service.ProcurarRealizador(Console.ReadLine() ?? "");
             if (real == null) Console.WriteLine("Não encontrado.");
             else Console.WriteLine($"[{real.Id}] {real.Nome} ({real.Pais})");
             break;
